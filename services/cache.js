@@ -13,8 +13,13 @@ client.set = util.promisify(client.set);
 // copy the exec function from Query constructor and prototype
 const exec = mongoose.Query.prototype.exec;
 
+// only Query with .cache() will cache the response .. otherwise will get response from mongodb and return that
+// this is one step to save the ram memory for redis {it can be costly}
 mongoose.Query.prototype.cache = function(){
+  // set the useCache property to Query object
   this.useCache = true;
+
+  // return this will allow chaining ex Blog.find({_user:adadadaferer}).cache().limit(1).sort(-_user)
   return this
 };
 
@@ -24,6 +29,7 @@ mongoose.Query.prototype.cache = function(){
 mongoose.Query.prototype.exec = async function () {
   // this --- refer to current Query
 
+  // if useCache property is not set to query object then directly go to mongodb for data
   if (!this.useCache) {
     console.log("From mongodb");
     return exec.apply(this, arguments)
