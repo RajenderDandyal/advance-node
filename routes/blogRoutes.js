@@ -3,7 +3,7 @@ const requireLogin = require('../middlewares/requireLogin');
 const redis = require('redis');
 const Blog = mongoose.model('Blog');
 const util = require('util');
-
+const {cleanCache} = require("../services/cache");
 
 module.exports = app => {
   app.get('/api/blogs/:id', requireLogin, async (req, res) => {
@@ -31,6 +31,7 @@ module.exports = app => {
 
     try {
       await blog.save();
+      await cleanCache({"_user":req.user._id,"collection":"blogs"});
       res.send(blog);
     } catch (err) {
       res.send(400, err);
