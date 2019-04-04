@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
-const redis = require('redis');
 const Blog = mongoose.model('Blog');
-const util = require('util');
 const {cleanCache} = require("../services/cache");
 
 module.exports = app => {
@@ -21,10 +19,11 @@ module.exports = app => {
   });
 
   app.post('/api/blogs', requireLogin, async (req, res) => {
-    const {title, content} = req.body;
+    const {title, content, imageUrl} = req.body;
 
     const blog = new Blog({
       title,
+      imageUrl,
       content,
       _user: req.user.id
     });
